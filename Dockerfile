@@ -12,7 +12,7 @@ COPY .env .
 COPY templates/ templates/
 
 # Expose port
-EXPOSE 5001
+EXPOSE 5004
 
 # Run the application
 CMD ["python", "app.py"]
