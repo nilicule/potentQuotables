@@ -74,8 +74,35 @@ def parse_signatures():
             processed_lines.append(' '.join(current_quote_part))
 
         # Join quote lines into a single line for display
-        quote = ' '.join(quote_lines).strip()
-        attribution = '\n'.join(attribution_lines) if attribution_lines else ""
+        quote_text = ' '.join(quote_lines).strip()
+
+        # Format the quote and attribution for display
+        if quote_text and attribution_lines:
+            # Extract just the author name from attribution lines (remove the "-- " prefix)
+            author_names = []
+            for attr_line in attribution_lines:
+                if attr_line.startswith('-- '):
+                    author_names.append(attr_line[3:])  # Remove "-- " prefix
+
+            if author_names:
+                quote = quote_text  # Keep quote text separate for display
+                attribution = ', '.join(author_names)  # Store clean author names
+            else:
+                quote = quote_text
+                attribution = ""
+        else:
+            # Check if the quote already has attribution embedded (fallback parsing)
+            if ' -- ' in quote_text:
+                parts = quote_text.rsplit(' -- ', 1)  # Split on last occurrence
+                if len(parts) == 2:
+                    quote = parts[0]  # Quote text without attribution
+                    attribution = parts[1]  # Extract the author name
+                else:
+                    quote = quote_text
+                    attribution = ""
+            else:
+                quote = quote_text
+                attribution = ""
 
         # Create full text preserving structure
         full_text_parts = []
