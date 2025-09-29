@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potent Quotables</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #searchInput {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #searchInput:focus {
+            border-color: #667eea;
+        }
+
+        .clear-btn {
+            padding: 12px 24px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            background-color: #da190b;
+        }
+
+        .results-count {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .signatures-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .signature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 5px solid #667eea;
+        }
+
+        .signature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .signature-quote {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            color: #333;
+            font-style: italic;
+        }
+
+        .signature-attribution {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            white-space: pre-line;
+        }
+
+        .copy-container {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: opacity 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            opacity: 0.8;
+        }
+
+        .copy-btn.copied {
+            background: #4CAF50;
+        }
+
+        .copy-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .search-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .signature-card {
+                padding: 1rem;
+            }
+
+            .signature-quote {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Potent Quotables</h1>
+            <div class="subtitle">Browse and search memorable quotes</div>
+        </header>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search quotes and attributions..." autocomplete="off">
+            <button class="clear-btn" onclick="clearSearch()">Clear</button>
+        </div>
+
+        <div class="results-count" id="resultsCount"></div>
+
+        <div class="signatures-container" id="signaturesContainer">
+            {% for sig in signatures %}
+            <div class="signature-card">
+                <div class="signature-quote">{{ sig.quote }}</div>
+                {% if sig.attribution %}
+                <div class="signature-attribution">{{ sig.attribution }}</div>
+                {% endif %}
+                <div class="copy-container">
+                    <button class="copy-btn" onclick="copySignature(this)" data-text="{{ sig.full_text|e }}">
+                        <svg class="copy-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            No signatures found matching your search.
+        </div>
+    </div>
+
+    <script>
+        let allSignatures = {{ signatures|tojson }};
+
+        function updateResultsCount(count) {
+            const resultsCount = document.getElementById('resultsCount');
+            if (count === allSignatures.length) {
+                resultsCount.textContent = `Showing all ${count} signatures`;
+            } else {
+                resultsCount.textContent = `Found ${count} of ${allSignatures.length} signatures`;
+            }
+        }
+
+        function renderSignatures(signatures) {
+            const container = document.getElementById('signaturesContainer');
+            const noResults = document.getElementById('noResults');
+
+            if (signatures.length === 0) {
+                container.style.display = 'none';
+                noResults.style.display = 'block';
+                updateResultsCount(0);
+                return;
+            }
+
+            container.style.display = 'grid';
+            noResults.style.display = 'none';
+
+            container.innerHTML = signatures.map(sig => `
+                <div class="signature-card">
+                    <div class="signature-quote">${escapeHtml(sig.quote)}</div>
+                    ${sig.attribution ? `<div class="signature-attribution">${escapeHtml(sig.attribution)}</div>` : ''}
+                    <div class="copy-container">
+                        <button class="copy-btn" onclick="copySignature(this)" data-text="${escapeHtml(sig.full_text)}">
+                            <svg class="copy-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            updateResultsCount(signatures.length);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function searchSignatures() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            if (!query) {
+                renderSignatures(allSignatures);
+                return;
+            }
+
+            const filtered = allSignatures.filter(sig =>
+                sig.quote.toLowerCase().includes(query) ||
+                sig.attribution.toLowerCase().includes(query)
+            );
+
+            renderSignatures(filtered);
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            renderSignatures(allSignatures);
+            document.getElementById('searchInput').focus();
+        }
+
+        function copySignature(button) {
+            const text = button.getAttribute('data-text');
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = `
+                    <svg class="copy-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                    Copied!
+                `;
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        // Set up search functionality
+        document.getElementById('searchInput').addEventListener('input', searchSignatures);
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchSignatures();
+            }
+        });
+
+        // Initialize
+        updateResultsCount(allSignatures.length);
+    </script>
+</body>
+</html>
